@@ -3,24 +3,19 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::get('/', 'App\Http\Controllers\PrincipalController@principal')->name('site.index');
+Route::get('/sobrenos', 'App\Http\Controllers\SobreNosController@principal')->name('site.sobrenos');
+Route::get('/contato', 'App\Http\Controllers\ContatoController@principal')->name('site.contato');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::prefix('/admin')-> group (function() {
+    Route::get('/clientes', function() {return 'Clientes';});
+    Route::get('/fornecedores', 'App\Http\Controllers\FornecedoresController@index')->name('admin.fornecedores');
+    Route::get('/produtos', function() {return 'produtos';});
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/admin', function(){
+    return redirect()->route('site.index');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,19 +23,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
-
-Route::get('/', function () {
-    return 'AULA DE PWIII';
-});
-
-Route::get('/quemsomos', function () {
-    return 'Quem somos';
-});
-
-Route::get('/contato/{nome}/{mensagem?}', 
+Route::get('/contato/{nome?}/{mensagem?}',
     function(string $nome, string $mensagem = 'sem texto')
-    {echo "passagem de parâmetros via browser:  $nome - $mensagem";}
+    {echo "passagem de parametros via browser: $nome - $mensagem";}
 );
 
+Route::fallback(function(){
+    echo ' a rota não existe <a href= "'.route('site.index'). '"> Clique aqui </a> ';
+});
 
+require __DIR__.'/auth.php';
